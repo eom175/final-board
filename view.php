@@ -2,7 +2,6 @@
 session_start();
 require_once 'db.php';
 
-// 게시글 ID 확인
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     echo "<p>잘못된 접근입니다.</p>";
     exit;
@@ -10,7 +9,6 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 
 $postId = intval($_GET['id']);
 
-// 게시글 + 작성자 정보 조회
 $sql = "
     SELECT posts.*, users.name
     FROM posts
@@ -33,17 +31,74 @@ $currentUserId = $_SESSION['user_id'] ?? null;
 $isOwner = ($currentUserId == $post['user_id']);
 ?>
 
-<!-- 게시글 상세 화면 -->
-<div class="post-view">
-    <h3><strong>Title:</strong> <?= htmlspecialchars($post['title']) ?></h3>
-    <div style="text-align: right; margin-bottom: 10px;">
-        <?= htmlspecialchars($post['name']) ?> |
-        <?= date('d/m/Y', strtotime($post['created_at'])) ?>
+<style>
+    .view-box {
+        width: 600px;
+        margin: 30px auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        font-family: Arial, sans-serif;
+        background-color: #fff;
+    }
+
+    .view-header {
+        font-size: 18px;
+        font-weight: bold;
+        border-bottom: 1px solid #aaa;
+        padding-bottom: 5px;
+        margin-bottom: 10px;
+    }
+
+    .view-title {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .view-meta {
+        text-align: right;
+        margin-bottom: 15px;
+        color: #555;
+    }
+
+    .view-content {
+        white-space: pre-line;
+        margin-bottom: 20px;
+    }
+
+    .view-buttons {
+        text-align: center;
+    }
+
+    .view-buttons button {
+        padding: 6px 12px;
+        margin: 0 5px;
+        background-color: #ddd;
+        border: none;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .view-buttons button:hover {
+        background-color: #ccc;
+    }
+</style>
+
+<div class="view-box">
+    <div class="view-header">Bulletin Board > Viewing Content</div>
+
+    <div class="view-title">
+        <strong>Title:</strong> <?= htmlspecialchars($post['title']) ?>
     </div>
 
-    <p><?= nl2br(htmlspecialchars($post['content'])) ?></p>
+    <div class="view-meta">
+        <?= htmlspecialchars($post['name']) ?> &nbsp; | &nbsp; <?= date('d/m/Y', strtotime($post['created_at'])) ?>
+    </div>
 
-    <div style="margin-top: 20px;">
+    <div class="view-content">
+        <?= nl2br(htmlspecialchars($post['content'])) ?>
+    </div>
+
+    <div class="view-buttons">
         <button id="list-btn">List</button>
 
         <?php if ($isOwner): ?>
@@ -58,18 +113,15 @@ $isOwner = ($currentUserId == $post['user_id']);
 
 <script>
 $(document).ready(function() {
-    // 목록
     $('#list-btn').on('click', function() {
         $('#content').load('list.php');
     });
 
-    // 수정
     $('#edit-btn').on('click', function() {
         const postId = $(this).data('id');
         $('#content').load('edit.php?id=' + postId);
     });
 
-    // 삭제
     $('#delete-btn').on('click', function() {
         const postId = $(this).data('id');
         if (confirm('정말 삭제하시겠습니까?')) {
@@ -86,16 +138,14 @@ $(document).ready(function() {
         }
     });
 
-    // 글쓰기
     $('#write-btn').on('click', function() {
         $('#content').load('write.php');
     });
 
-    // 로그아웃
     $('#logout-btn').on('click', function() {
         $.post('ajax/logout.php', function(response) {
             if (response.success) {
-                location.reload();  // 또는 $('#login-section').show(); $('#content').empty();
+                location.reload();
             }
         }, 'json').fail(function() {
             alert('로그아웃 중 오류 발생');

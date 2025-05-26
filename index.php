@@ -7,13 +7,51 @@ session_start();
     <meta charset="UTF-8">
     <title>AJAX 게시판</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fafafa;
+        }
+        #login-section {
+            width: 300px;
+            margin: 100px auto;
+            padding: 30px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        #login-section h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        #login-form input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            box-sizing: border-box;
+        }
+        #login-form button {
+            width: 100%;
+            padding: 10px;
+            background-color: #ddd;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        #login-form button:hover {
+            background-color: #ccc;
+        }
+    </style>
 </head>
 <body>
     <div id="login-section">
+        <h2>Login</h2>
         <form id="login-form">
-            <input type="text" name="userid" placeholder="아이디" required>
-            <input type="password" name="password" placeholder="비밀번호" required>
-            <button type="submit">로그인</button>
+            <label>User ID</label>
+            <input type="text" name="userid" required>
+            <label>Password</label>
+            <input type="password" name="password" required>
+            <button type="submit">Login</button>
         </form>
     </div>
 
