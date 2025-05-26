@@ -15,7 +15,6 @@ if (!isset($_SESSION['user_id'])) {
     background: #fff;
     font-family: Arial, sans-serif;
 }
-
 .write-header {
     font-size: 18px;
     font-weight: bold;
@@ -23,14 +22,12 @@ if (!isset($_SESSION['user_id'])) {
     padding-bottom: 5px;
     margin-bottom: 20px;
 }
-
 .write-form label {
     display: inline-block;
     width: 100px;
     font-weight: bold;
     margin-top: 10px;
 }
-
 .write-form input[type="text"],
 .write-form input[type="password"],
 .write-form textarea {
@@ -39,17 +36,14 @@ if (!isset($_SESSION['user_id'])) {
     margin-bottom: 10px;
     box-sizing: border-box;
 }
-
 .write-form textarea {
     height: 100px;
     resize: vertical;
 }
-
 .write-buttons {
     text-align: right;
     margin-top: 20px;
 }
-
 .write-buttons button {
     padding: 6px 12px;
     margin-left: 5px;
@@ -58,7 +52,6 @@ if (!isset($_SESSION['user_id'])) {
     font-weight: bold;
     cursor: pointer;
 }
-
 .write-buttons button:hover {
     background-color: #ccc;
 }
@@ -69,10 +62,10 @@ if (!isset($_SESSION['user_id'])) {
 
     <form id="write-form" class="write-form">
         <label>Name</label>
-        <input type="text" value="<?= htmlspecialchars($_SESSION['name']) ?>" disabled><br>
+        <input type="text" name="display_name" disabled><br>
 
         <label>Password</label>
-        <input type="password" value="******" disabled><br>
+        <input type="text" name="masked_password" readonly><br>
 
         <label>Title</label>
         <input type="text" name="title" placeholder="제목" required><br>
@@ -90,6 +83,25 @@ if (!isset($_SESSION['user_id'])) {
 
 <script>
 $(document).ready(function() {
+    // 사용자 정보 비동기 로드
+    $.ajax({
+        url: 'ajax/get_user_info.php',
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                $('input[name="display_name"]').val(response.name);
+                $('input[name="masked_password"]').val(response.password);
+            } else {
+                alert(response.message);
+            }
+        },
+        error: function() {
+            alert('사용자 정보 불러오기 실패');
+        }
+    });
+
+    // 글 등록
     $('#write-form').on('submit', function(e) {
         e.preventDefault();
         $.ajax({
@@ -111,10 +123,12 @@ $(document).ready(function() {
         });
     });
 
+    // 목록 이동
     $('#list-btn').on('click', function() {
         $('#content').load('list.php');
     });
 
+    // 로그아웃
     $('#logout-btn').on('click', function() {
         $.post('ajax/logout.php', function(response) {
             if (response.success) {

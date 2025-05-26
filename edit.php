@@ -30,61 +30,54 @@ $post = $result->fetch_assoc();
 ?>
 
 <style>
-    .edit-box {
-        width: 600px;
-        margin: 30px auto;
-        padding: 20px;
-        border: 1px solid #ccc;
-        background: #fff;
-        font-family: Arial, sans-serif;
-    }
-
-    .edit-header {
-        font-size: 18px;
-        font-weight: bold;
-        border-bottom: 1px solid #aaa;
-        padding-bottom: 5px;
-        margin-bottom: 20px;
-    }
-
-    .edit-form label {
-        display: inline-block;
-        width: 100px;
-        font-weight: bold;
-        margin-top: 10px;
-    }
-
-    .edit-form input[type="text"],
-    .edit-form input[type="password"],
-    .edit-form textarea {
-        width: 80%;
-        padding: 6px;
-        margin-bottom: 10px;
-        box-sizing: border-box;
-    }
-
-    .edit-form textarea {
-        height: 100px;
-        resize: vertical;
-    }
-
-    .edit-buttons {
-        text-align: right;
-        margin-top: 20px;
-    }
-
-    .edit-buttons button {
-        padding: 6px 12px;
-        margin-left: 5px;
-        background-color: #ddd;
-        border: none;
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-    .edit-buttons button:hover {
-        background-color: #ccc;
-    }
+.edit-box {
+    width: 600px;
+    margin: 30px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    background: #fff;
+    font-family: Arial, sans-serif;
+}
+.edit-header {
+    font-size: 18px;
+    font-weight: bold;
+    border-bottom: 1px solid #aaa;
+    padding-bottom: 5px;
+    margin-bottom: 20px;
+}
+.edit-form label {
+    display: inline-block;
+    width: 100px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+.edit-form input[type="text"],
+.edit-form input[type="password"],
+.edit-form textarea {
+    width: 80%;
+    padding: 6px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+.edit-form textarea {
+    height: 100px;
+    resize: vertical;
+}
+.edit-buttons {
+    text-align: right;
+    margin-top: 20px;
+}
+.edit-buttons button {
+    padding: 6px 12px;
+    margin-left: 5px;
+    background-color: #ddd;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+.edit-buttons button:hover {
+    background-color: #ccc;
+}
 </style>
 
 <div class="edit-box">
@@ -94,10 +87,10 @@ $post = $result->fetch_assoc();
         <input type="hidden" name="id" value="<?= $post['id'] ?>">
 
         <label>Name</label>
-        <input type="text" value="<?= htmlspecialchars($_SESSION['name']) ?>" disabled><br>
+        <input type="text" name="display_name" disabled><br>
 
         <label>Password</label>
-        <input type="password" value="******" disabled><br>
+        <input type="text" name="masked_password" readonly><br>
 
         <label>Title</label>
         <input type="text" name="title" value="<?= htmlspecialchars($post['title']) ?>" required><br>
@@ -115,6 +108,25 @@ $post = $result->fetch_assoc();
 
 <script>
 $(document).ready(function() {
+    // 사용자 이름/비밀번호 마스킹 불러오기
+    $.ajax({
+        url: 'ajax/get_user_info.php',
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                $('input[name="display_name"]').val(response.name);
+                $('input[name="masked_password"]').val(response.password);
+            } else {
+                alert(response.message);
+            }
+        },
+        error: function() {
+            alert('사용자 정보 불러오기 실패');
+        }
+    });
+
+    // 수정 저장
     $('#edit-form').on('submit', function(e) {
         e.preventDefault();
         $.ajax({
